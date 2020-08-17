@@ -1,0 +1,83 @@
+from flask_restful import Resource, Api
+from flask import Flask, jsonify
+from threading import Thread
+
+from PIL import Image, ImageOps
+from io import BytesIO
+
+import requests
+import time
+
+Gotten = requests.get("https://i.ytimg.com/vi/cMWCDA_tNzM/hqdefault.jpg?sqp=-oaymwEXCNACELwBSFryq4qpAwkIARUAAIhCGAE=&rs=AOn4CLDAOjgHJx1DBBDW6adI9xfGhPcetg.jpg")
+
+print("Status Code:", Gotten.status_code)
+
+Opened = Image.open(BytesIO(Gotten.content))
+Path = "images/image" + Opened.format
+
+Flipped = ImageOps.flip(Opened)
+SizeX, SizeY = (720, 540)
+
+#resize the image just enough to fit the canvas, but have it not stretched
+FitImage = ImageOps.fit(
+  Flipped,
+  (SizeX, SizeY),
+  centering = (.5, .5)
+)
+ColX, ColY = FitImage.size
+
+FitImage.convert("RGB")
+
+Increment = .01
+Modulo = None
+
+Colors = []
+
+Start = time.time()
+
+print("Loading colors")
+
+def Check(Num):
+  if Modulo == None:
+    return True
+  else:
+    return Num % Modulo == 0
+for X in range(ColX):
+  if Check(X) == True:
+    XTable = []
+
+    for Y in range(ColY):
+      if Check(Y) == True:
+        XTable.append(FitImage.getpixel((X, Y)))
+    Colors.append(XTable)
+
+Elapsed = int(time.time() - Start)
+
+print("Colors loaded")
+print("Time taken: " + str(Elapsed) + " second" + (Elapsed == 1 and "" or "s"))
+
+app = Flask(__name__)
+api = Api(app)
+
+class GetFunction(Resource):
+  print("Functions loading")
+
+  def get(self, Function : str = None):
+    Data = "No data found."
+
+    if Function == "GetSize":
+      Data = [[SizeX, SizeY], Increment, [0, 5, -100]]
+    elif Function == "GetColors":
+      Data = Colors
+    elif Function == "Ping":
+      Data = "Pong!"
+    
+    return jsonify(Data) or Data
+  
+  print("Functions loaded")
+
+def run():
+  app.run(host = "0.0.0.0", port = 8080)
+def start():
+  t = Thread(target = run)
+  t.start()

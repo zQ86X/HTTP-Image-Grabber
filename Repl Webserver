@@ -8,6 +8,7 @@ from io import BytesIO
 import requests
 import time
 
+# The image to load.
 Gotten = requests.get("https://i.ytimg.com/vi/cMWCDA_tNzM/hqdefault.jpg?sqp=-oaymwEXCNACELwBSFryq4qpAwkIARUAAIhCGAE=&rs=AOn4CLDAOjgHJx1DBBDW6adI9xfGhPcetg.jpg")
 
 print("Status Code:", Gotten.status_code)
@@ -16,9 +17,11 @@ Opened = Image.open(BytesIO(Gotten.content))
 Path = "images/image" + Opened.format
 
 Flipped = ImageOps.flip(Opened)
-SizeX, SizeY = (720, 540)
 
-#resize the image just enough to fit the canvas, but have it not stretched
+# How big you want the canvas to be.
+SizeX, SizeY = (480, 360)
+
+# Resize the image just enough to fit the canvas, but have it not stretched
 FitImage = ImageOps.fit(
   Flipped,
   (SizeX, SizeY),
@@ -28,7 +31,9 @@ ColX, ColY = FitImage.size
 
 FitImage.convert("RGB")
 
-Increment = .01
+# How big the parts are.
+Increment = .1
+# If Increment is greater than 1, I would suggest setting this to Increment.
 Modulo = None
 
 Colors = []

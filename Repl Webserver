@@ -14,8 +14,6 @@ Gotten = requests.get("https://cdn.discordapp.com/attachments/685889041190879265
 print("Status Code:", Gotten.status_code)
 
 Opened = Image.open(BytesIO(Gotten.content))
-Path = "images/image" + Opened.format
-
 Flipped = ImageOps.flip(Opened)
 
 # How big you want the canvas to be.
@@ -68,7 +66,12 @@ class GetFunction(Resource):
     Data = "No data found."
 
     if Function == "GetSize":
-      Data = [[SizeX, SizeY], Increment, [0, 5, -100]]
+      Data = {
+        "Increment": Increment,
+        "Offset": [0, 5, -100],
+        "Size": [SizeX, SizeY],
+        "Step": Step
+      }
     elif Function == "GetColors":
       Data = Colors
     elif Function == "Ping":

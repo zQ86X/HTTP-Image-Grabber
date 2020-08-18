@@ -9,7 +9,7 @@ import requests
 import time
 
 # The image to load.
-Gotten = requests.get("https://i.ytimg.com/vi/cMWCDA_tNzM/hqdefault.jpg?sqp=-oaymwEXCNACELwBSFryq4qpAwkIARUAAIhCGAE=&rs=AOn4CLDAOjgHJx1DBBDW6adI9xfGhPcetg.jpg")
+Gotten = requests.get("https://cdn.discordapp.com/attachments/685889041190879265/745344225570193449/682.png")
 
 print("Status Code:", Gotten.status_code)
 
@@ -19,7 +19,7 @@ Path = "images/image" + Opened.format
 Flipped = ImageOps.flip(Opened)
 
 # How big you want the canvas to be.
-SizeX, SizeY = (480, 360)
+SizeX, SizeY = (765, 700)
 
 # Resize the image just enough to fit the canvas, but have it not stretched
 FitImage = ImageOps.fit(
@@ -34,7 +34,7 @@ FitImage.convert("RGB")
 # How big the parts are.
 Increment = .1
 # If Increment is greater than 1, I would suggest setting this to Increment.
-Modulo = None
+Step = 1
 
 Colors = []
 
@@ -42,18 +42,11 @@ Start = time.time()
 
 print("Loading colors")
 
-def Check(Num):
-  if Modulo == None:
-    return True
-  else:
-    return Num % Modulo == 0
-for X in range(ColX):
-  if Check(X) == True:
+for X in range(0, ColX, Step):
     XTable = []
 
-    for Y in range(ColY):
-      if Check(Y) == True:
-        XTable.append(FitImage.getpixel((X, Y)))
+    for Y in range(0, ColY, Step):
+      XTable.append(FitImage.getpixel((X, Y)))
     Colors.append(XTable)
 
 Elapsed = int(time.time() - Start)
@@ -63,6 +56,10 @@ print("Time taken: " + str(Elapsed) + " second" + (Elapsed == 1 and "" or "s"))
 
 app = Flask(__name__)
 api = Api(app)
+
+@app.route("/")
+def home():
+  return "Online"
 
 class GetFunction(Resource):
   print("Functions loading")
